@@ -1,5 +1,5 @@
 package model
 
 type Email struct {
-	emails string 
+	Emails []string `json:"emails"` 
 }

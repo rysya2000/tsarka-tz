@@ -1,9 +1,13 @@
 package app
 
 import (
+	"log"
+	"net/http"
 	"rest/config"
-	"rest/internal/usecase"	
 	"rest/internal/delivery"
+	"rest/internal/usecase"
+
+	"github.com/go-chi/chi"
 )
 
 func Run(cfg *config.Config) {
@@ -12,8 +16,12 @@ func Run(cfg *config.Config) {
 
 	handler := delivery.New(usecase)
 
+	//  HTTP Server
+	Mux := chi.NewRouter()
+	delivery.NewRouter(Mux, handler)
 
-//  HTTP
-	
+	log.Printf("Starting up on http://localhost:%s", cfg.HTTP.Port)
+
+	log.Fatal(http.ListenAndServe(":"+cfg.HTTP.Port, Mux))
 
 }

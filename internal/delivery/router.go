@@ -3,21 +3,23 @@ package delivery
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
-func NewRouter(handler *gin.Engine, r *Handler) {
+func NewRouter(Mux *chi.Mux, r *Handler) {
 
-	handler.Use(gin.Recovery())
+	// Options
+	Mux.Use(middleware.Logger)
 
-	handler.GET("/health", func(c *gin.Context) { c.Status(http.StatusOK) })
+	// healthcheck
+	Mux.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("health"))
+	})
 
-	h := handler.Group("/rest")
-	{
-		h.POST("/substr/find", r.SubStrHandler)
-		h.POST("/email/check", r.EmailHandler)
-		h.GET("/self/find/:str", r.SelfHandler)
-	}
-	
+	Mux.Post("/rest/substr/find", r.SubStrHandler)
+	Mux.Post("/rest/email/check", r.EmailHandler)
+	Mux.Get("/rest/self/find/{str}", r.SelfHandler)
+
 }
-
